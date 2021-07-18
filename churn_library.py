@@ -51,7 +51,7 @@ class ChurnLibrarySolution:
         output:
                 None
         '''
-
+        
         cat_columns = [col for col in df if is_string_dtype(df[col])]
         quant_columns = [col for col in df if is_numeric_dtype(df[col])]
 
@@ -218,6 +218,7 @@ class ChurnLibrarySolution:
         # Add feature names as x-axis labels
         plt.xticks(range(X_data.shape[1]), names, rotation=90)
 
+    
     def train_models(self, X_train, X_test, y_train, y_test):
         '''
         train, store model results: images + scores, and store models
@@ -259,6 +260,7 @@ class ChurnLibrarySolution:
                                          y_test_preds_rf)
 
         lrc_plot = plot_roc_curve(lrc, X_test, y_test)
+        
         plt.figure(figsize=(15, 8))
         ax = plt.gca()
         rfc_disp = plot_roc_curve(

@@ -39,8 +39,7 @@ class TestingAndLogging(unittest.TestCase):
         #needs refactoring so that churn class asserts read file correctness
         self.df = self.churn_obj.import_data("./data/bank_data.csv")
         self.category_lst = [col for col in self.df if is_string_dtype(self.df[col])]
-        
-
+  
     @get_time
     def test_import(self):
         '''
@@ -110,11 +109,18 @@ class TestingAndLogging(unittest.TestCase):
             raise err
         
     @get_time
-    def test_train_models(train_models):
+    def test_train_models(self):
         '''
         test train_models
         '''
-        pass
+        df = self.churn_obj.train_models(self.df, self.category_lst)
+        try:
+            X_train, X_test, y_train, y_test = self.churn_obj.perform_feature_engineering(df)
+            logging.info(f"Train/Test and feature engineering ran successfully!")
+                  
+        except Exception as err:
+            logging.error(f"someting is wrong with train_models()")
+            raise err
 
 
 if __name__ == '__main__':
