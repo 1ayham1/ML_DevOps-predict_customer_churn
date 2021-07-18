@@ -1,4 +1,5 @@
 import os
+import logging
 
 
 from pandas.api.types import is_string_dtype
@@ -7,31 +8,46 @@ from functools import wraps
 from churn_library import ChurnLibrarySolution
 
 
+logging.basicConfig(
+    filename='./logs/churn_library.log',
+    level=logging.INFO,
+    filemode='w',
+    format='%(name)s - %(levelname)s - %(message)s')
+
+
 class TestingAndLogging:
 
     def __init__(self):
-        pass
+        self.edito = "hi stupid python"
 
-    def get_log_info(test_func):
+    #@staticmethod
+    def get_time(function):
+        '''
+        wrapper to return execution time of a function
+        '''
+        import time
 
-        import logging
+        @wraps(function)
+        def wrapper(*args, **kwargs):
+            t_start = time.time()
+            run_fun = function(*args, **kwargs)
+            t_end = time.time() - t_start
+            print(f'{function.__name__} ran in {t_end:0.3f} sec')
 
-        logging.basicConfig(
-            filename='./logs/churn_library.log',
-            level=logging.INFO,
-            filemode='w',
-            format='%(name)s - %(levelname)s - %(message)s')
-		
-		@wraps(test_func)
-        return None
+            return run_fun
 
+        return wrapper
+
+    @get_time
     def test_import(self, import_data):
         '''
-        test data import - this example is completed for you to assist with the other test functions
+        test data import
         '''
         try:
             df = import_data("./data/bank_data.csv")
             logging.info("Testing import_data: SUCCESS")
+            print("yeeeeeh")
+
         except FileNotFoundError as err:
             logging.error("Testing import_eda: The file wasn't found")
             raise err
@@ -45,24 +61,26 @@ class TestingAndLogging:
             raise err
 
     def test_eda(perform_eda):
-        '''
-        test perform eda function
-        '''
+        '''test perform eda function'''
+        return None
 
     def test_encoder_helper(encoder_helper):
         '''
         test encoder helper
         '''
+        pass
 
     def test_perform_feature_engineering(perform_feature_engineering):
         '''
         test perform_feature_engineering
         '''
+        pass
 
     def test_train_models(train_models):
         '''
         test train_models
         '''
+        pass
 
 
 if __name__ == '__main__':
@@ -70,15 +88,16 @@ if __name__ == '__main__':
     df_obj = ChurnLibrarySolution()
     test_obj = TestingAndLogging()
 
+    
     test_obj.test_import(df_obj.import_data)
 
-    #df = df_obj.import_data("./data/bank_data.csv")
+    # df = df_obj.import_data("./data/bank_data.csv")
     # print(df.head())
 
     # df_obj.perform_eda(df)
-    #category_lst = [col for col in df if is_string_dtype(df[col])]
+    # category_lst = [col for col in df if is_string_dtype(df[col])]
 
-    #df = df_obj.encoder_helper(df, category_lst)
+    # df = df_obj.encoder_helper(df, category_lst)
 
-    #X_train, X_test, y_train, y_test = df_obj.perform_feature_engineering(df)
+    # X_train, X_test, y_train, y_test = df_obj.perform_feature_engineering(df)
     # print(X_train.head())
