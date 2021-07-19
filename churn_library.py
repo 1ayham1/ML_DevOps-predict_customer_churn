@@ -109,11 +109,11 @@ class ChurnLibrarySolution:
 
         return df
 
-    def perform_feature_engineering(self, df, response="1"):
+    def perform_feature_engineering(self, df, keep_cols):
         '''
         input:
                 df: pandas dataframe
-                response: string of response name [optional argument that could be used for naming variables or index y column]
+                keep_cols: list of string column names to be considered
 
         output:
                 X_train: X training data
@@ -122,27 +122,6 @@ class ChurnLibrarySolution:
                 y_test: y testing data
         '''
 
-        keep_cols = [
-            'Customer_Age',
-            'Dependent_count',
-            'Months_on_book',
-            'Total_Relationship_Count',
-            'Months_Inactive_12_mon',
-            'Contacts_Count_12_mon',
-            'Credit_Limit',
-            'Total_Revolving_Bal',
-            'Avg_Open_To_Buy',
-            'Total_Amt_Chng_Q4_Q1',
-            'Total_Trans_Amt',
-            'Total_Trans_Ct',
-            'Total_Ct_Chng_Q4_Q1',
-            'Avg_Utilization_Ratio',
-            'Gender_Churn',
-            'Education_Level_Churn',
-            'Marital_Status_Churn',
-            'Income_Category_Churn',
-            'Card_Category_Churn']
-
         X = pd.DataFrame()
         X[keep_cols] = df[keep_cols]
         y = df['Churn']
@@ -150,7 +129,7 @@ class ChurnLibrarySolution:
         X_train, X_test, y_train, y_test = train_test_split(
             X, y, test_size=0.3, random_state=42)
 
-        return X_train, X_test, y_train, y_test
+        return X, X_train, X_test, y_train, y_test
 
     def classification_report_image(self, y_train,
                                     y_test,
@@ -185,111 +164,7 @@ class ChurnLibrarySolution:
         print('train results')
         print(classification_report(y_train, y_train_preds_lr))
 
-    def feature_importance_plot(self, model, X_data, output_pth):
-        '''
-        creates and stores the feature importances in pth
-        input:
-                model: model object containing feature_importances_
-                X_data: pandas dataframe of X values
-                output_pth: path to store the figure
-
-        output:
-                None
-        '''
-
-        # Calculate feature importances
-        importances = model.best_estimator_.feature_importances_
-        # Sort feature importances in descending order
-        indices = np.argsort(importances)[::-1]
-
-        # Rearrange feature names so they match the sorted feature importances
-        names = [X_data.columns[i] for i in indices]
-
-        # Create plot
-        plt.figure(figsize=(20, 5))
-
-        # Create plot title
-        plt.title("Feature Importance")
-        plt.ylabel('Importance')
-
-        # Add bars
-        plt.bar(range(X_data.shape[1]), importances[indices])
-
-        # Add feature names as x-axis labels
-        plt.xticks(range(X_data.shape[1]), names, rotation=90)
-
-    
-    def train_models(self, X_train, X_test, y_train, y_test):
-        '''
-        train, store model results: images + scores, and store models
-        input:
-                X_train: X training data
-                X_test: X testing data
-                y_train: y training data
-                y_test: y testing data
-        output:
-                None
-        '''
-        # grid search
-        rfc = RandomForestClassifier(random_state=42)
-        lrc = LogisticRegression()
-
-        param_grid = {
-            'n_estimators': [200, 500],
-            'max_features': ['auto', 'sqrt'],
-            'max_depth': [4, 5, 100],
-            'criterion': ['gini', 'entropy']
-        }
-
-        cv_rfc = GridSearchCV(estimator=rfc, param_grid=param_grid, cv=5)
-        cv_rfc.fit(X_train, y_train)
-
-        lrc.fit(X_train, y_train)
-
-        y_train_preds_rf = cv_rfc.best_estimator_.predict(X_train)
-        y_test_preds_rf = cv_rfc.best_estimator_.predict(X_test)
-
-        y_train_preds_lr = lrc.predict(X_train)
-        y_test_preds_lr = lrc.predict(X_test)
-
-        self.classification_report_image(y_train,
-                                         y_test,
-                                         y_train_preds_lr,
-                                         y_train_preds_rf,
-                                         y_test_preds_lr,
-                                         y_test_preds_rf)
-
-        lrc_plot = plot_roc_curve(lrc, X_test, y_test)
-        
-        plt.figure(figsize=(15, 8))
-        ax = plt.gca()
-        rfc_disp = plot_roc_curve(
-            cv_rfc.best_estimator_,
-            X_test,
-            y_test,
-            ax=ax,
-            alpha=0.8)
-        lrc_plot.plot(ax=ax, alpha=0.8)
-        plt.show()
-
-        # save best model
-        joblib.dump(cv_rfc.best_estimator_, './models/rfc_model.pkl')
-        joblib.dump(lrc, './models/logistic_model.pkl')
-
-        #rfc_model = joblib.load('./models/rfc_model.pkl')
-        #lr_model = joblib.load('./models/logistic_model.pkl')
-
-        #lrc_plot = plot_roc_curve(lr_model, X_test, y_test)
-
-        #plt.figure(figsize=(15, 8))
-        #ax = plt.gca()
-        #rfc_disp = plot_roc_curve(rfc_model, X_test, y_test, ax=ax, alpha=0.8)
-        #lrc_plot.plot(ax=ax, alpha=0.8)
-        # plt.show()
-
-        explainer = shap.TreeExplainer(cv_rfc.best_estimator_)
-        shap_values = explainer.shap_values(X_test)
-        shap.summary_plot(shap_values, X_test, plot_type="bar")
+        #-------------------------------------------------------
 
         plt.rc('figure', figsize=(5, 5))
         # plt.text(0.01, 0.05, str(model.summary()), {'fontsize': 12}) old
@@ -304,6 +179,10 @@ class ChurnLibrarySolution:
                  'fontsize': 10}, fontproperties='monospace')  # approach improved by OP -> monospace!
         plt.axis('off')
 
+        plt.savefig("./images/results/RF_SummaryReport.jpg")
+
+        #-------------------------------------------------------
+
         plt.rc('figure', figsize=(5, 5))
         plt.text(0.01, 1.25, str('Logistic Regression Train'),
                  {'fontsize': 10}, fontproperties='monospace')
@@ -314,3 +193,122 @@ class ChurnLibrarySolution:
         plt.text(0.01, 0.7, str(classification_report(y_test, y_test_preds_lr)), {
                  'fontsize': 10}, fontproperties='monospace')  # approach improved by OP -> monospace!
         plt.axis('off')
+
+        plt.savefig("./images/results/LR_SummaryReport.jpg")
+
+
+
+    def feature_importance_plot(self, model, X_data, output_pth):
+        '''
+        creates and stores the feature importances in pth
+        input:
+                model: model object containing feature_importances_
+                X_data: pandas dataframe of X values
+                output_pth: path to store the figure
+
+        output:
+                None
+        '''
+
+        # Calculate feature importances
+        importances = model.feature_importances_
+        # Sort feature importances in descending order
+        indices = np.argsort(importances)[::-1]
+
+        # Rearrange feature names so they match the sorted feature importances
+        names = [X_data.columns[i] for i in indices]
+
+        # Create plot
+        plt.figure(figsize=(20,15))
+
+        # Create plot title
+        plt.title("Feature Importance")
+        plt.ylabel('Importance')
+
+        # Add bars
+        plt.bar(range(X_data.shape[1]), importances[indices])
+
+        # Add feature names as x-axis labels
+        plt.xticks(range(X_data.shape[1]), names, rotation=90)
+
+        plt.savefig(output_pth+"FeatureImortance.jpg")
+
+    
+    def train_models(self, X_data, X_train, X_test, y_train, y_test,trained):
+        '''
+        train, store model results: images + scores, and store models
+        input:
+                X_data : features before splitting
+                X_train: X training data
+                X_test: X testing data
+                y_train: y training data
+                y_test: y testing data
+                trained: flag Ture if the model is already trained.
+        output:
+                None
+        '''
+        if(not trained):
+            #train the model
+            # grid search
+            rfc = RandomForestClassifier(random_state=42)
+            lrc = LogisticRegression()
+
+            param_grid = {
+                'n_estimators': [200, 500],
+                'max_features': ['auto', 'sqrt'],
+                'max_depth': [4, 5, 100],
+                'criterion': ['gini', 'entropy']
+            }
+
+            cv_rfc = GridSearchCV(estimator=rfc, param_grid=param_grid, cv=5)
+            cv_rfc.fit(X_train, y_train)
+            rfc_model = cv_rfc.best_estimator_
+
+            lrc.fit(X_train, y_train)
+            lr_model = lrc
+
+            # save best model
+            joblib.dump(rfc_model, './models/rfc_model.pkl')
+            joblib.dump(lr_model, './models/logistic_model.pkl')
+
+
+        else:
+            #load saved model
+            rfc_model = joblib.load('./models/rfc_model.pkl')
+            lr_model = joblib.load('./models/logistic_model.pkl')
+
+
+        y_train_preds_rf = rfc_model.predict(X_train)
+        y_test_preds_rf = rfc_model.predict(X_test)
+
+        y_train_preds_lr = lr_model.predict(X_train)
+        y_test_preds_lr = lr_model.predict(X_test)
+
+        # print scores as images
+        self.classification_report_image(y_train, y_test,
+                                    y_train_preds_lr, y_train_preds_rf,
+                                    y_test_preds_lr, y_test_preds_rf)
+
+        self.feature_importance_plot(rfc_model, X_data, "./images/results/")
+
+        #best model explainer
+        plt.figure(figsize=(20, 15))
+        explainer = shap.TreeExplainer(rfc_model)
+        shap_values = explainer.shap_values(X_test)
+        shap.summary_plot(shap_values, X_test, plot_type="bar",show=False)
+        plt.savefig("./images/results/BestModel_explainer.jpg")
+
+        plt.clf()
+        lrc_plot = plot_roc_curve(lr_model, X_test, y_test)
+
+        plt.figure(figsize=(15, 8))
+        ax = plt.gca()
+        rfc_disp = plot_roc_curve(rfc_model,
+                                X_test,y_test, ax=ax,alpha=0.8)
+        lrc_plot.plot(ax=ax, alpha=0.8)
+        plt.savefig("./images/results/LRC_ROC.jpg")
+
+
+
+        
+    
