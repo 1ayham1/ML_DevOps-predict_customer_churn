@@ -14,3 +14,19 @@ root - INFO - ---------------------------------------------------
 root - INFO - Train/Test and feature engineering ran successfully!
 root - INFO - test_train_models ran in 122.136 sec 
 root - INFO - ---------------------------------------------------
+root - INFO - exploratory figures has been generated. check [./images/eda/]
+root - INFO - test_eda ran in 6.915 sec 
+root - INFO - ---------------------------------------------------
+root - INFO - encoder helper ran successfully. 
+root - INFO - test_encoder_helper ran in 0.763 sec 
+root - INFO - ---------------------------------------------------
+root - INFO - Testing import_data: SUCCESS
+root - INFO - churn data has 10127 rows and 23 columns
+root - INFO - test_import ran in 0.037 sec 
+root - INFO - ---------------------------------------------------
+root - INFO - Train/Test and feature engineering ran successfully!
+root - INFO - test_perform_feature_engineering ran in 0.810 sec 
+root - INFO - ---------------------------------------------------
+root - INFO - train_models ran successfully!
+root - INFO - test_train_models ran in 126.656 sec 
+root - INFO - ---------------------------------------------------
