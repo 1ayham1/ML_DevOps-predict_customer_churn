@@ -18,7 +18,7 @@ Initial feature correlation
 ![plot](./images/eda/CORR_heatmap.jpg)
 
 following that feature importance was analyzed
-![plot](./images/eda/FeatureImortance.jpg)
+![plot](./images/results/FeatureImortance.jpg)
 
 ## Dependencies
 
