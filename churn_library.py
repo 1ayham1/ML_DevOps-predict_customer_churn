@@ -1,6 +1,4 @@
-# library doc string
-'''
-'''
+''' train ML model to evaluate customer churn'''
 
 # import libraries
 from sklearn.metrics import plot_roc_curve, classification_report
@@ -8,7 +6,7 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import normalize
+#from sklearn.preprocessing import normalize
 from pandas.api.types import is_numeric_dtype
 from pandas.api.types import is_string_dtype
 import shap
@@ -22,10 +20,15 @@ sns.set()
 
 
 class ChurnLibrarySolution:
+    '''import/analyze data and build ML model
 
-    def __init(self):
+    ChurnLibrarySolution class loads .csv data from a data folder, performs exploratory
+    data analysis and save results to images/eda folder. It then examins two ML models:
+    logistic regression and random forest -after performing grid search to pick up best
+    performing parameters
 
-        pass
+    Training/testing results as well as performance plot are saved to images/results
+    '''
 
     def import_data(self, path):
         '''
@@ -51,7 +54,7 @@ class ChurnLibrarySolution:
         output:
                 None
         '''
-        
+
         cat_columns = [col for col in df if is_string_dtype(df[col])]
         quant_columns = [col for col in df if is_numeric_dtype(df[col])]
 
@@ -94,7 +97,7 @@ class ChurnLibrarySolution:
         input:
                 df: pandas dataframe
                 category_lst: list of columns that contain categorical features
-                response: string of response name [optional argument that could be used for naming variables or index y column]
+                response: string of response name [col of interest]
 
         output:
                 df: pandas dataframe with new columns for
@@ -164,39 +167,51 @@ class ChurnLibrarySolution:
         print('train results')
         print(classification_report(y_train, y_train_preds_lr))
 
-        #-------------------------------------------------------
+        # -------------------------------------------------------
 
         plt.rc('figure', figsize=(5, 5))
         # plt.text(0.01, 0.05, str(model.summary()), {'fontsize': 12}) old
         # approach
         plt.text(0.01, 1.25, str('Random Forest Train'), {
                  'fontsize': 10}, fontproperties='monospace')
-        plt.text(0.01, 0.05, str(classification_report(y_test, y_test_preds_rf)), {
-                 'fontsize': 10}, fontproperties='monospace')  # approach improved by OP -> monospace!
+        # approach improved by OP -> monospace!
+        plt.text(
+            0.01, 0.05, str(
+                classification_report(
+                    y_test, y_test_preds_rf)), {
+                'fontsize': 10}, fontproperties='monospace')
         plt.text(0.01, 0.6, str('Random Forest Test'), {
                  'fontsize': 10}, fontproperties='monospace')
-        plt.text(0.01, 0.7, str(classification_report(y_train, y_train_preds_rf)), {
-                 'fontsize': 10}, fontproperties='monospace')  # approach improved by OP -> monospace!
+        # approach improved by OP -> monospace!
+        plt.text(
+            0.01, 0.7, str(
+                classification_report(
+                    y_train, y_train_preds_rf)), {
+                'fontsize': 10}, fontproperties='monospace')
         plt.axis('off')
 
         plt.savefig("./images/results/RF_SummaryReport.jpg")
 
-        #-------------------------------------------------------
+        # -------------------------------------------------------
 
         plt.rc('figure', figsize=(5, 5))
         plt.text(0.01, 1.25, str('Logistic Regression Train'),
                  {'fontsize': 10}, fontproperties='monospace')
-        plt.text(0.01, 0.05, str(classification_report(y_train, y_train_preds_lr)), {
-                 'fontsize': 10}, fontproperties='monospace')  # approach improved by OP -> monospace!
+        plt.text(
+            0.01, 0.05, str(
+                classification_report(
+                    y_train, y_train_preds_lr)), {
+                'fontsize': 10}, fontproperties='monospace')
         plt.text(0.01, 0.6, str('Logistic Regression Test'), {
                  'fontsize': 10}, fontproperties='monospace')
-        plt.text(0.01, 0.7, str(classification_report(y_test, y_test_preds_lr)), {
-                 'fontsize': 10}, fontproperties='monospace')  # approach improved by OP -> monospace!
+        plt.text(
+            0.01, 0.7, str(
+                classification_report(
+                    y_test, y_test_preds_lr)), {
+                'fontsize': 10}, fontproperties='monospace')
         plt.axis('off')
 
         plt.savefig("./images/results/LR_SummaryReport.jpg")
-
-
 
     def feature_importance_plot(self, model, X_data, output_pth):
         '''
@@ -219,7 +234,7 @@ class ChurnLibrarySolution:
         names = [X_data.columns[i] for i in indices]
 
         # Create plot
-        plt.figure(figsize=(20,15))
+        plt.figure(figsize=(20, 15))
 
         # Create plot title
         plt.title("Feature Importance")
@@ -231,10 +246,9 @@ class ChurnLibrarySolution:
         # Add feature names as x-axis labels
         plt.xticks(range(X_data.shape[1]), names, rotation=90)
 
-        plt.savefig(output_pth+"FeatureImortance.jpg")
+        plt.savefig(output_pth + "FeatureImortance.jpg")
 
-    
-    def train_models(self, X_data, X_train, X_test, y_train, y_test,trained):
+    def train_models(self, X_data, X_train, X_test, y_train, y_test, trained):
         '''
         train, store model results: images + scores, and store models
         input:
@@ -247,10 +261,9 @@ class ChurnLibrarySolution:
         output:
                 None
         '''
-        if(not trained):
-            #train the model
-            # grid search
-            rfc = RandomForestClassifier(random_state=42)
+        if not trained:
+            # train the model
+            rfc = RandomForestClassifier(random_state=42)  # grid search
             lrc = LogisticRegression()
 
             param_grid = {
@@ -271,12 +284,10 @@ class ChurnLibrarySolution:
             joblib.dump(rfc_model, './models/rfc_model.pkl')
             joblib.dump(lr_model, './models/logistic_model.pkl')
 
-
         else:
-            #load saved model
+            # load saved model
             rfc_model = joblib.load('./models/rfc_model.pkl')
             lr_model = joblib.load('./models/logistic_model.pkl')
-
 
         y_train_preds_rf = rfc_model.predict(X_train)
         y_test_preds_rf = rfc_model.predict(X_test)
@@ -286,16 +297,16 @@ class ChurnLibrarySolution:
 
         # print scores as images
         self.classification_report_image(y_train, y_test,
-                                    y_train_preds_lr, y_train_preds_rf,
-                                    y_test_preds_lr, y_test_preds_rf)
+                                         y_train_preds_lr, y_train_preds_rf,
+                                         y_test_preds_lr, y_test_preds_rf)
 
         self.feature_importance_plot(rfc_model, X_data, "./images/results/")
 
-        #best model explainer
+        # best model explainer
         plt.figure(figsize=(20, 15))
         explainer = shap.TreeExplainer(rfc_model)
         shap_values = explainer.shap_values(X_test)
-        shap.summary_plot(shap_values, X_test, plot_type="bar",show=False)
+        shap.summary_plot(shap_values, X_test, plot_type="bar", show=False)
         plt.savefig("./images/results/BestModel_explainer.jpg")
 
         plt.clf()
@@ -304,11 +315,6 @@ class ChurnLibrarySolution:
         plt.figure(figsize=(15, 8))
         ax = plt.gca()
         rfc_disp = plot_roc_curve(rfc_model,
-                                X_test,y_test, ax=ax,alpha=0.8)
+                                  X_test, y_test, ax=ax, alpha=0.8)
         lrc_plot.plot(ax=ax, alpha=0.8)
         plt.savefig("./images/results/LRC_ROC.jpg")
-
-
-
-        
-    

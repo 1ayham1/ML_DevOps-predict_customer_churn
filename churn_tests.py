@@ -1,14 +1,12 @@
-#import os
+'''unit test class for churn library'''
 import time
 import logging
 import unittest
-
 
 from pandas.api.types import is_string_dtype
 from functools import wraps
 
 from churn_library import ChurnLibrarySolution
-
 
 keep_cols = [
     'Customer_Age',
@@ -31,12 +29,12 @@ keep_cols = [
     'Income_Category_Churn',
     'Card_Category_Churn']
 
-
 logging.basicConfig(
     filename='./logs/churn_library.log',
     level=logging.INFO,
-    #filemode='w',
+    # filemode='w',
     format='%(name)s - %(levelname)s - %(message)s')
+
 
 def get_time(function):
     '''
@@ -47,30 +45,35 @@ def get_time(function):
         t_start = time.time()
         run_fun = function(*args, **kwargs)
         t_end = time.time() - t_start
-        logging.info(f'{function.__name__} ran in {t_end:0.3f} sec')
-        logging.info(f'{"-"*60}')
-        
+        logging.info('%s ran in %0.3f sec ', function.__name__, t_end)
+        logging.info('---------------------------------------------------')
+        # logging.info(f'{"-"*60}') #does not use lazy formatting
+
         return run_fun
     return wrapper
-    
+
+
 class TestingAndLogging(unittest.TestCase):
+    '''perform unit tests for all functions in churn library'''
 
     def setUp(self):
+        '''prepare parameters to be used in the test'''
+
         self.churn_obj = ChurnLibrarySolution()
-        #needs refactoring so that churn class asserts read file correctness
+        # needs refactoring so that churn class asserts read file correctness
         self.df = self.churn_obj.import_data("./data/bank_data.csv")
-        self.category_lst = [col for col in self.df if is_string_dtype(self.df[col])]
-  
+        self.category_lst = [
+            col for col in self.df if is_string_dtype(
+                self.df[col])]
+
     @get_time
     def test_import(self):
-        '''
-        test data import
-        '''
-        
+        ''' test data import'''
+
         try:
             df = self.churn_obj.import_data("./data/bank_data.csv")
             logging.info("Testing import_data: SUCCESS")
-     
+
         except FileNotFoundError as err:
             logging.error("Testing import_data: file wasn't found")
             raise err
@@ -78,7 +81,10 @@ class TestingAndLogging(unittest.TestCase):
         try:
             assert df.shape[0] > 0
             assert df.shape[1] > 0
-            logging.info(f"churn data has {df.shape[0]} rows and {df.shape[1]} columns ")
+            logging.info(
+                'churn data has %d rows and %d columns',
+                df.shape[0],
+                df.shape[1])
 
         except AssertionError as err:
             logging.error(
@@ -88,73 +94,75 @@ class TestingAndLogging(unittest.TestCase):
     @get_time
     def test_eda(self):
         '''test perform eda function'''
-  
+
         try:
             self.churn_obj.perform_eda(self.df)
-            logging.info(f"exploratory figures has been generated. check [./images/eda/] ")
-        
+            logging.info(
+                "exploratory figures has been generated. check [./images/eda/]")
+
         except Exception as err:
-            logging.error(f"someting is wrong with eda()")
+            logging.error("someting is wrong with eda()")
             raise err
 
     @get_time
     def test_encoder_helper(self):
-        '''
-        test encoder helper
-        '''
+        '''test encoder helper'''
+
         try:
             df = self.churn_obj.encoder_helper(self.df, self.category_lst)
-            logging.info(f"encoder helper ran successfully. ")
-        
+            logging.info("encoder helper ran successfully. ")
+
         except Exception as err:
-            logging.error(f"someting is wrong with encoder_helper()")
+            logging.error("someting is wrong with encoder_helper()")
             raise err
 
     @get_time
     def test_perform_feature_engineering(self):
-        '''
-        test perform_feature_engineering
-        '''
+        '''test perform_feature_engineering'''
+
         df = self.churn_obj.encoder_helper(self.df, self.category_lst)
 
         try:
-            X_data, X_train, X_test, y_train, y_test = self.churn_obj.perform_feature_engineering(df,keep_cols)
-            logging.info(f"Train/Test and feature engineering ran successfully!")
-            logging.info(f"X_train is of shape: {X_train.shape}")
-            logging.info(f"Y_train is of shape: {y_train.shape}")
-            logging.info(f"X_test is of shape: {X_test.shape}")
-            logging.info(f"Y_test is of shape: {y_test.shape}")
-        
+            X_data, X_train, X_test, y_train, y_test = self.churn_obj.perform_feature_engineering(
+                df, keep_cols)
+            logging.info(
+                "Train/Test and feature engineering ran successfully!")
+            logging.info("X_train is of shape: %d ", X_train.shape)
+            logging.info("Y_train is of shape: %d ", y_train.shape)
+            logging.info("X_test is of shape: %d ", X_test.shape)
+            logging.info("Y_test is of shape: %d ", y_test.shape)
+
         except Exception as err:
-            logging.error(f"someting is wrong with perform_feature_engineering()")
+            logging.error(
+                "someting is wrong with perform_feature_engineering()")
             raise err
-        
+
     @get_time
     def test_train_models(self):
-        '''
-        test train_models
-        '''
+        '''test train_models'''
+
         df = self.churn_obj.encoder_helper(self.df, self.category_lst)
-        X_data, X_train, X_test, y_train, y_test = self.churn_obj.perform_feature_engineering(df,keep_cols)
+        X_data, X_train, X_test, y_train, y_test = self.churn_obj.perform_feature_engineering(
+            df, keep_cols)
 
         try:
-            self.churn_obj.train_models(X_data,X_train, X_test, y_train, y_test,trained=True)
-            logging.info(f"Train/Test and feature engineering ran successfully!")
-                  
+            self.churn_obj.train_models(
+                X_data, X_train, X_test, y_train, y_test, trained=True)
+            logging.info(
+                "Train/Test and feature engineering ran successfully!")
+
         except Exception as err:
-            logging.error(f"someting is wrong with train_models()")
+            logging.error("someting is wrong with train_models()")
             raise err
 
 
 if __name__ == '__main__':
 
     unittest.main()
-    
+
     #churn_obj = ChurnLibrarySolution()
     #df = churn_obj.import_data("./data/bank_data.csv")
     #category_lst = [col for col in df if is_string_dtype(df[col])]
     #df = churn_obj.encoder_helper(df, category_lst)
     #X_data, X_train, X_test, y_train, y_test = churn_obj.perform_feature_engineering(df,keep_cols)
     #churn_obj.train_models(X_data,X_train, X_test, y_train, y_test,trained=True)
-
-
