@@ -1,4 +1,8 @@
-''' train ML model to evaluate customer churn'''
+''' train ML model to evaluate customer churn
+
+Author : Ayham Zaza
+Date   : 19 July.2021 
+'''
 
 # import libraries
 from sklearn.metrics import plot_roc_curve, classification_report
@@ -168,13 +172,14 @@ class ChurnLibrarySolution:
         print(classification_report(y_train, y_train_preds_lr))
 
         # -------------------------------------------------------
-
+        plt.clf()
         plt.rc('figure', figsize=(5, 5))
         # plt.text(0.01, 0.05, str(model.summary()), {'fontsize': 12}) old
         # approach
         plt.text(0.01, 1.25, str('Random Forest Train'), {
                  'fontsize': 10}, fontproperties='monospace')
         # approach improved by OP -> monospace!
+        plt.clf()
         plt.text(
             0.01, 0.05, str(
                 classification_report(
