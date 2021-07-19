@@ -1,10 +1,6 @@
 # Predict-Customer-Churn
-Project 1 of Machine Learning DevOps Engineer Nanodegree by Udacity: https://www.udacity.com/course/machine-learning-dev-ops-engineer-nanodegree--nd0821
+Project 1 of Machine Learning DevOps Engineer Nanodegree by Udacity. [Link](https://www.udacity.com/course/machine-learning-dev-ops-engineer-nanodegree--nd0821)
 
-
-# Predict Customer Churn
-
-- Project **Predict Customer Churn** of ML DevOps Engineer Nanodegree Udacity
 
 ## Project Description
 In this project, you will implement your learnings to identify credit card customers that are most likely to churn. The completed project will include a Python package for a machine learning project that follows coding (PEP8) and engineering best practices for implementing software (modular, documented, and tested). The package will also have the flexibility of being run interactively or from the command-line interface (CLI).
