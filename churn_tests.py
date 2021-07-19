@@ -148,8 +148,7 @@ class TestingAndLogging(unittest.TestCase):
         try:
             self.churn_obj.train_models(
                 X_data, X_train, X_test, y_train, y_test, trained=True)
-            logging.info(
-                "Train/Test and feature engineering ran successfully!")
+            logging.info("train_models ran successfully!")
 
         except Exception as err:
             logging.error("someting is wrong with train_models()")
