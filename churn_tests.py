@@ -1,4 +1,4 @@
-import os
+#import os
 import time
 import logging
 import unittest
@@ -134,9 +134,11 @@ class TestingAndLogging(unittest.TestCase):
         '''
         test train_models
         '''
-        
+        df = self.churn_obj.encoder_helper(self.df, self.category_lst)
+        X_data, X_train, X_test, y_train, y_test = self.churn_obj.perform_feature_engineering(df,keep_cols)
+
         try:
-            X_data,X_train, X_test, y_train, y_test = self.churn_obj.perform_feature_engineering(df,keep_cols)
+            self.churn_obj.train_models(X_data,X_train, X_test, y_train, y_test,trained=True)
             logging.info(f"Train/Test and feature engineering ran successfully!")
                   
         except Exception as err:
@@ -146,15 +148,13 @@ class TestingAndLogging(unittest.TestCase):
 
 if __name__ == '__main__':
 
-    #unittest.main()
-    churn_obj = ChurnLibrarySolution()
-    df = churn_obj.import_data("./data/bank_data.csv")
-    category_lst = [col for col in df if is_string_dtype(df[col])]
+    unittest.main()
     
-    df = churn_obj.encoder_helper(df, category_lst)
-    
-    X_data, X_train, X_test, y_train, y_test = churn_obj.perform_feature_engineering(df,keep_cols)
-    
-    churn_obj.train_models(X_data,X_train, X_test, y_train, y_test,True)
+    #churn_obj = ChurnLibrarySolution()
+    #df = churn_obj.import_data("./data/bank_data.csv")
+    #category_lst = [col for col in df if is_string_dtype(df[col])]
+    #df = churn_obj.encoder_helper(df, category_lst)
+    #X_data, X_train, X_test, y_train, y_test = churn_obj.perform_feature_engineering(df,keep_cols)
+    #churn_obj.train_models(X_data,X_train, X_test, y_train, y_test,trained=True)
 
 

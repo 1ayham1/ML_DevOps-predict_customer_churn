@@ -1,0 +1,20 @@
+root - INFO - exploratory figures has been generated. check [./images/eda/] 
+root - INFO - test_eda ran in 7.711 sec
+root - INFO - ------------------------------------------------------------
+root - INFO - encoder helper ran successfully. 
+root - INFO - test_encoder_helper ran in 0.829 sec
+root - INFO - ------------------------------------------------------------
+root - INFO - Testing import_data: SUCCESS
+root - INFO - churn data has 10127 rows and 23 columns 
+root - INFO - test_import ran in 0.036 sec
+root - INFO - ------------------------------------------------------------
+root - INFO - Train/Test and feature engineering ran successfully!
+root - INFO - X_train is of shape: (7088, 19)
+root - INFO - Y_train is of shape: (7088,)
+root - INFO - X_test is of shape: (3039, 19)
+root - INFO - Y_test is of shape: (3039,)
+root - INFO - test_perform_feature_engineering ran in 1.333 sec
+root - INFO - ------------------------------------------------------------
+root - INFO - Train/Test and feature engineering ran successfully!
+root - INFO - test_train_models ran in 122.832 sec
+root - INFO - ------------------------------------------------------------
